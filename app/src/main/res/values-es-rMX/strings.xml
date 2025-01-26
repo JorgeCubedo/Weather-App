@@ -9,4 +9,16 @@
     <string name="str_network_error">Error de conexión</string>
     <string name="str_sunrise">Amanecer</string>
     <string name="str_sunset">Atardecer</string>
+    <string-array name="str_weather_conditions">
+        <item>Cielo despejado</item>
+        <item>Parcialmente despejado</item>
+        <item>Nubes dispersas</item>
+        <item>Nubes rotas</item>
+        <item>Chubascos</item>
+        <item>Lluvia</item>
+        <item>Tormenta eléctrica</item>
+        <item>Nieve</item>
+        <item>Niebla</item>
+        <item>Condición desconocida</item>
+    </string-array>
 </resources>

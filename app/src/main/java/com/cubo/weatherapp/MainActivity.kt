@@ -9,6 +9,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -22,7 +23,8 @@ import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Locale
 import kotlin.math.round
 
@@ -37,6 +39,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var progressBar: ProgressBar
     lateinit var txtSunrise: TextView
     lateinit var txtSunset: TextView
+    lateinit var progressInfo: ProgressBar
+    lateinit var linearLayout: LinearLayout
+    lateinit var txtWeatherCondition: TextView
 
     lateinit var weatherRes: WeatherResponse
     var isCelsius: Boolean = true
@@ -99,6 +104,8 @@ class MainActivity : AppCompatActivity() {
     //Se consume el api para obtener la informacion
     //Consumes the api to get the information
     private fun loadApiWeather(query: String) {
+        progressInfo.visibility = View.VISIBLE
+        linearLayout.visibility = View.GONE
         val apikey = "32043d4537be983f458bed8ab729426e"
         val api = RetrofitClient.instance.create(ApiService::class.java)
         api.getWeather(query, apikey).enqueue(object : retrofit2.Callback<WeatherResponse>{
@@ -114,6 +121,8 @@ class MainActivity : AppCompatActivity() {
                     loadInfo(weatherRes, isCelsius)
                     saveCity(query)
                 }
+
+                progressInfo.visibility = View.GONE
             }
 
             override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
@@ -135,6 +144,11 @@ class MainActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progress_icon)
         txtSunrise = findViewById(R.id.text_sunrise)
         txtSunset = findViewById(R.id.text_sunset)
+        progressInfo = findViewById(R.id.progress_info)
+        linearLayout = findViewById(R.id.layout_weather_info)
+        txtWeatherCondition = findViewById(R.id.text_weather_condition)
+        linearLayout.visibility = View.GONE
+        progressInfo.visibility = View.GONE
     }
 
     //Carga la informacion del api y las escribe en los textviews, validando si es celsius o fahrenheit
@@ -161,22 +175,36 @@ class MainActivity : AppCompatActivity() {
         txtTemp.text = textWeather
         txtFeelsLike.text = textFeelsLike
         txtTempMax.text = textTemp
-        val timezone = weatherResponse.timezone * 1000
 
-        val sunriseDate = Date((weatherResponse.sys.sunrise * 1000) + timezone)
-        val sunsetDate = Date((weatherResponse.sys.sunset * 1000) + timezone)
-
-
-        val dateFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-        val strSunrise = "${getString(R.string.str_sunrise)}: ${dateFormat.format(sunriseDate)}"
-        val strSunset = "${getString(R.string.str_sunset)}: ${dateFormat.format(sunsetDate)}"
-        txtSunrise.text = strSunrise
-        txtSunset.text = strSunset
+        loadSunriseAndSunset(weatherResponse)
 
         if (weatherResponse.weather.isNotEmpty())
-            loadIcon(weatherResponse.weather.first().icon)
+            loadIcon(weatherResponse.weather.first().icon, weatherResponse.weather.first().description)
+
+        txtWeatherCondition.text = getCondition(weatherResponse.weather.first().description)
+        linearLayout.visibility = View.VISIBLE
     }
 
+    //Convert the timezone from seconds to UTC and writes the time of the local sunrise and sunset
+    //Convierte la zona horaria de segundos a UTC y escribe la hora de amanecer y atardecer local
+    private fun loadSunriseAndSunset(weatherResponse: WeatherResponse) {
+        val timezone = weatherResponse.timezone
+
+        val zoneId = ZoneId.ofOffset("UTC", java.time.ZoneOffset.ofTotalSeconds(timezone))
+
+        val sunrise = Instant.ofEpochSecond(weatherResponse.sys.sunrise).atZone(zoneId)
+        val sunset = Instant.ofEpochSecond(weatherResponse.sys.sunset).atZone(zoneId)
+
+        Log.d(TAG, "Sunrise: ${sunrise.toLocalTime()}")
+        Log.d(TAG, "Sunset: ${sunset.toLocalTime()}")
+        val sunriseTime = sunrise.toLocalTime()
+        val sunsetTime = sunset.toLocalTime()
+
+        val strSunrise = "${getString(R.string.str_sunrise)}: $sunriseTime"
+        val strSunset = "${getString(R.string.str_sunset)}: $sunsetTime"
+        txtSunrise.text = strSunrise
+        txtSunset.text = strSunset
+    }
     //Convierte los grados kelvin a celsius o fahrenheit dependiendo del segundo parametro.
     //Convert the kelvin grades to celsius or fahrenheit depending by the second param
     private fun convertKelvin(kelvin: Double, isCelsius: Boolean): Double {
@@ -188,7 +216,7 @@ class MainActivity : AppCompatActivity() {
 
     //Se cargar el icono mediante la informacion del api y la biblioteca Picasso
     //Loads the icon using the api's information and the Picasso library
-    private fun loadIcon(icon: String) {
+    private fun loadIcon(icon: String, condition: String) {
         imgView.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
         val url = "${RetrofitClient.BASE_URL_ICON}img/wn/${icon}@2x.png"
@@ -197,10 +225,34 @@ class MainActivity : AppCompatActivity() {
             .load(url)
             .into(imgView)
 
+        imgView.contentDescription = getCondition(condition)
         progressBar.visibility = View.GONE
         imgView.visibility = View.VISIBLE
     }
 
+    private fun getCondition(condition:String): String {
+        var conditions = resources.getStringArray(R.array.str_weather_conditions)
+
+        val index = when(condition.toLowerCase(Locale.ROOT)) {
+            "clear sky" -> 0
+            "few clouds" -> 1
+            "scattered clouds" -> 2
+            "broken clouds" -> 3
+            "shower rain" -> 4
+            "rain" -> 5
+            "thunderstorm" -> 6
+            "snow" -> 7
+            "mist" -> 8
+            else -> 9
+        }
+
+        return if (index in conditions.indices) {
+            conditions[index]
+        }
+        else {
+            ""
+        }
+    }
     //Guarda la ultima ciudad consultada exitosamente usando el shared preference
     //Saves the latest city successfully used, using the shared preference
     private fun saveCity(city: String) {

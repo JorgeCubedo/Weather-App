@@ -8,4 +8,16 @@
     <string name="str_network_error">Network Error.</string>
     <string name="str_sunrise">Sunrise</string>
     <string name="str_sunset">Sunset</string>
+    <string-array name="str_weather_conditions">
+        <item>Clear sky</item>
+        <item>Few clouds</item>
+        <item>Scattered clouds</item>
+        <item>Broken clouds</item>
+        <item>Shower rain</item>
+        <item>Rain</item>
+        <item>Thunderstorm</item>
+        <item>Snow</item>
+        <item>Mist</item>
+        <item>Unknown condition</item>
+    </string-array>
 </resources>

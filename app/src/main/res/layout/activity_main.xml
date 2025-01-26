@@ -43,21 +43,29 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:layout_weight="4"
-                android:layout_marginVertical="10dp"
+
                 android:layout_gravity="center">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/text_weather"
                     android:textSize="20sp"
-                    android:layout_marginHorizontal="10dp" />
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="5dp"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/text_feels_like"
                     android:textSize="20sp"
                     android:layout_marginHorizontal="10dp"
-                    android:layout_marginTop="10dp"/>
+                    android:layout_marginTop="5dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_weather_condition"
+                    android:textSize="20sp"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="5dp"/>
             </LinearLayout>
 
             <ImageView
@@ -97,5 +105,15 @@
             android:layout_marginTop="10dp"
             android:layout_marginHorizontal="10dp"/>
     </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        android:id="@+id/progress_info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
