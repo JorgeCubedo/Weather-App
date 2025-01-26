@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Weather App</string>
+    <string name="str_city">Write your city</string>
+    <string name="str_weather">Weather</string>
+    <string name="feels_like">Feels Like</string>
+    <string name="str_temp_max">Temp. max.</string>
+    <string name="str_temp_min">Temp. min.</string>
+    <string name="str_network_error">Network Error.</string>
+    <string name="str_sunrise">Sunrise</string>
+    <string name="str_sunset">Sunset</string>
+</resources>

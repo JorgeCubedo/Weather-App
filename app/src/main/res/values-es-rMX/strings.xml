@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Aplicación del Clima</string>
+    <string name="str_city">Escribe tu ciudad</string>
+    <string name="str_weather">Clima</string>
+    <string name="feels_like">"Sensación térmica  "</string>
+    <string name="str_temp_max">Temp. max.</string>
+    <string name="str_temp_min">Temp. min.</string>
+    <string name="str_network_error">Error de conexión</string>
+    <string name="str_sunrise">Amanecer</string>
+    <string name="str_sunset">Atardecer</string>
+</resources>
