@@ -1,6 +1,9 @@
 package com.cubo.weatherapp
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.net.NetworkInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -50,7 +53,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         initUI()
-
+        if (!checkConnection(applicationContext))
+            Toast.makeText(applicationContext, getString(R.string.str_no_network_warning), Toast.LENGTH_LONG).show()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -70,10 +74,15 @@ class MainActivity : AppCompatActivity() {
         //search the city using the Search button in the keyboard
         edtCity.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = edtCity.text.toString().trim()
-                if (query.isNotEmpty()) {
-                    loadApiWeather(query)
+                if (checkConnection(applicationContext)) {
+                    val query = edtCity.text.toString().trim()
+                    if (query.isNotEmpty()) {
+                        loadApiWeather(query)
+                    }
+                } else {
+                    Toast.makeText(applicationContext, getString(R.string.str_no_network_warning), Toast.LENGTH_LONG).show()
                 }
+
                 true
             }
             else
@@ -267,5 +276,12 @@ class MainActivity : AppCompatActivity() {
     private fun getCity(): String {
         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         return sharedPreferences.getString("CITY", "") ?: ""
+    }
+
+    private fun checkConnection(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities((network))
+        return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
     }
 }

@@ -9,6 +9,7 @@
     <string name="str_network_error">Error de conexión</string>
     <string name="str_sunrise">Amanecer</string>
     <string name="str_sunset">Atardecer</string>
+    <string name="str_no_network_warning">Conéctate a una red para utilizar esta aplicación</string>
     <string-array name="str_weather_conditions">
         <item>Cielo despejado</item>
         <item>Parcialmente despejado</item>

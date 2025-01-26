@@ -8,6 +8,7 @@
     <string name="str_network_error">Network Error.</string>
     <string name="str_sunrise">Sunrise</string>
     <string name="str_sunset">Sunset</string>
+    <string name="str_no_network_warning">Connect to a network to use this app</string>
     <string-array name="str_weather_conditions">
         <item>Clear sky</item>
         <item>Few clouds</item>
