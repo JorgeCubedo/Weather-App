@@ -101,6 +101,13 @@ class MainActivity : AppCompatActivity() {
                 isCelsius = !isCelsius
                 Log.i(TAG, "IsCelsius: $isCelsius")
 
+                if (isCelsius) {
+                    item.title = getString(R.string.str_change2fahrenheit)
+                }
+                else {
+                    item.title = getString(R.string.str_change2celsius)
+                }
+
                 if (weatherRes != null) {
                     loadInfo(weatherRes, isCelsius)
                 }
@@ -113,6 +120,10 @@ class MainActivity : AppCompatActivity() {
     //Se consume el api para obtener la informacion
     //Consumes the api to get the information
     private fun loadApiWeather(query: String) {
+        if (!checkConnection(applicationContext)) {
+            Toast.makeText(applicationContext, getString(R.string.str_no_network_warning), Toast.LENGTH_LONG).show()
+            return
+        }
         progressInfo.visibility = View.VISIBLE
         linearLayout.visibility = View.GONE
         val apikey = "32043d4537be983f458bed8ab729426e"
@@ -163,23 +174,16 @@ class MainActivity : AppCompatActivity() {
     //Carga la informacion del api y las escribe en los textviews, validando si es celsius o fahrenheit
     //Load the api information and writes int the textviews, checking if ii celsius or fahrenheit.
     private fun loadInfo(weatherResponse: WeatherResponse, isCelsius: Boolean) {
-        var textWeather = getString(R.string.str_weather) + ": " + convertKelvin(weatherResponse.main.temp, isCelsius)
-        var textFeelsLike = getString(R.string.feels_like) + ": " + convertKelvin(weatherResponse.main.feels_like, isCelsius)
-        var textTempMax = "${getString(R.string.str_temp_max)}:  ${convertKelvin(weatherResponse.main.temp_max, isCelsius)}"
-        var textTempMin = "${getString(R.string.str_temp_min)}: ${convertKelvin(weatherResponse.main.temp_min, isCelsius)}"
 
-        if (isCelsius) {
-            textWeather += "°C"
-            textFeelsLike += "°C"
-            textTempMax += "°C"
-            textTempMin += "°C"
-        }
-        else {
-            textWeather += "°F"
-            textFeelsLike += "°F"
-            textTempMax += "°F"
-            textTempMin += "°F"
-        }
+        var type = "°C"
+        if (!isCelsius)
+            type = "°F"
+
+        val textWeather = "${getString(R.string.str_weather)}: ${convertKelvin(weatherResponse.main.temp, isCelsius)}$type"
+        val textFeelsLike = "${getString(R.string.feels_like)}: ${convertKelvin(weatherResponse.main.feels_like, isCelsius)}$type"
+        val textTempMax = "${getString(R.string.str_temp_max)}:  ${convertKelvin(weatherResponse.main.temp_max, isCelsius)}$type"
+        val textTempMin = "${getString(R.string.str_temp_min)}: ${convertKelvin(weatherResponse.main.temp_min, isCelsius)}$type"
+
         val textTemp = "$textTempMax - $textTempMin"
         txtTemp.text = textWeather
         txtFeelsLike.text = textFeelsLike
@@ -239,6 +243,8 @@ class MainActivity : AppCompatActivity() {
         imgView.visibility = View.VISIBLE
     }
 
+    //Se obtiene el indice de la condicion del clima, tomado directamente de la documentacion del api y mas una condicion extra
+    //Gets the weather condition index, taken from the api documentation and an extra condition.
     private fun getCondition(condition:String): String {
         var conditions = resources.getStringArray(R.array.str_weather_conditions)
 
@@ -246,6 +252,9 @@ class MainActivity : AppCompatActivity() {
             "clear sky" -> 0
             "few clouds" -> 1
             "scattered clouds" -> 2
+            //Este no esta en la documentacion, pero me sale en la respuesta del api
+            //This does not appears in the documentation, but it appears in the api response.
+            "overcast clouds" -> 2
             "broken clouds" -> 3
             "shower rain" -> 4
             "rain" -> 5
